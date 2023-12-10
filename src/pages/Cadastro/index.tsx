@@ -1,10 +1,10 @@
-import { Forms } from "../../components/Forms";
+import { CardGlobal } from "../../components/Card";
 import "./styles.scss";
 
 export function Cadastro() {
   return (
-    <div>
-      <Forms></Forms>
+    <div className="container">
+      <CardGlobal></CardGlobal>
     </div>
   );
 }
