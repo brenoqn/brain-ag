@@ -1,12 +1,14 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
-
-import "./styles/global.css";
-
+import ReactDOM from "react-dom";
+import { Provider } from "react-redux";
 import { Home } from "./pages/Home/index.tsx";
+import { store } from "./store.ts";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+ReactDOM.render(
   <React.StrictMode>
-    <Home />
-  </React.StrictMode>
+    <Provider store={store}>
+      <Home />
+    </Provider>
+  </React.StrictMode>,
+  document.getElementById("root")
 );

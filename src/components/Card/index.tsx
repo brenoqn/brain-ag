@@ -6,12 +6,27 @@ import StepLabel from "@mui/material/StepLabel";
 import Stepper from "@mui/material/Stepper";
 import Typography from "@mui/material/Typography";
 import React from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
 import { DescricaoFazendaForm } from "../Forms/DescFazendaForm";
 import { InformacoesFazendaForm } from "../Forms/InfFazendaForm";
 import { InformacoesPessoaisForm } from "../Forms/InfPessoaisForm";
+import "./styles.scss";
+
+interface FormData {
+  nomeProdutor: string;
+  cpf: string;
+  idade: number;
+  email: string;
+  cnpj: string;
+  nomeFazenda: string;
+  cidade: string;
+  estado: string;
+}
 
 export function CardGlobal() {
   const [activeStep, setActiveStep] = React.useState(0);
+  const formData = useSelector((state: RootState) => state.form);
 
   const getStepContent = (step: number) => {
     switch (step) {
@@ -26,27 +41,37 @@ export function CardGlobal() {
     }
   };
 
+  const handleBackClick = () => {
+    handleBack();
+  };
+
+  const handleBack = () => {
+    console.log('Voltando para o step anterior');
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const isStepValid = (formData: FormData) => {
+    console.log('Validando:', formData);
+    const isValid = formData.nomeProdutor !== '' && formData.cpf !== '' && formData.idade !== 0 && formData.email !== '';
+    console.log('É válido?', isValid);
+    return isValid;
+  };
+
+  const handleNextClick = () => {
+    console.log('Clicou em Próximo, Dados Atuais:', formData);
+    if (isStepValid(formData)) {
+      handleNext();
+    } else {
+      console.log('Falha na validação, não pode avançar.');
+    }
+  };
+
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
-  const isStepValid = () => {
-    // Aqui você pode adicionar a lógica de validação para permitir avançar entre as etapas
-    return true; // Substitua por sua própria lógica de validação
-  };
-
-  const handleNextClick = () => {
-    if (isStepValid()) {
-      handleNext();
-    }
-  };
-
-  const handleBackClick = () => {
-    handleBack();
+  const handleSubmit = () => {
+    console.log('Dados finais no submit:', formData);
   };
 
   return (
@@ -57,7 +82,6 @@ export function CardGlobal() {
             <Typography variant="h3" component="div" className="title">
               Cadastro de Produtor Rural
             </Typography>
-            {/* Outros elementos do cabeçalho */}
           </div>
           <div className="card--cadastro__content--body">
             <Stepper activeStep={activeStep} alternativeLabel>
@@ -72,11 +96,15 @@ export function CardGlobal() {
               </Step>
             </Stepper>
             {getStepContent(activeStep)}
-            <div>
+            <div className="buttons">
               <Button disabled={activeStep === 0} onClick={handleBackClick}>
                 Anterior
               </Button>
-              <Button variant="contained" color="primary" onClick={handleNextClick}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={activeStep === 2 ? handleSubmit : handleNextClick}
+              >
                 {activeStep === 2 ? "Finalizar" : "Próximo"}
               </Button>
             </div>

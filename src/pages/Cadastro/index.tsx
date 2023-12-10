@@ -3,7 +3,7 @@ import "./styles.scss";
 
 export function Cadastro() {
   return (
-    <div className="container">
+    <div className="cadastro">
       <CardGlobal></CardGlobal>
     </div>
   );

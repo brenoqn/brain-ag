@@ -1,4 +1,3 @@
-
 import { Cadastro } from "../Cadastro";
 import "./styles.scss";
 
