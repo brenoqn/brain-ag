@@ -1,9 +1,11 @@
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   ProdutorRural,
   RootState,
@@ -33,6 +35,7 @@ export function ListaProdutores() {
 
   const produtores = useSelector((state: RootState) => state.produtores);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const excluir = (id: string) => {
     dispatch(excluirProdutor(id));
@@ -42,97 +45,115 @@ export function ListaProdutores() {
     setEditId(id);
     const produtor = produtores.find((p) => p.id === id);
     if (produtor) {
-      setEditData(produtor);
+      setEditData({ ...produtor });
     } else {
       setEditData(produtorInicial);
     }
   };
 
-  const handleSave = (id: string) => {
-    dispatch(editarProdutor({ ...editData, id }));
+  const handleSave = () => {
+    dispatch(editarProdutor(editData));
     setEditId(null);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof ProdutorRural) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    field: keyof ProdutorRural
+  ) => {
     setEditData({ ...editData, [field]: e.target.value });
   };
-  
+  const handleNavigate = () => {
+    navigate("/");
+  };
 
   return (
     <Card className="card">
-      <CardContent>
-        <div className="card__header">
-          <Typography variant="h3" component="div" className="title">
-            Cadastro de Produtor Rural
-          </Typography>
-          <img className="logo" src="/logo.png" />
-        </div>
+      <div className="card__header">
+        <Typography variant="h3" component="div" className="title">
+          Lista de Produtores Rurais Cadastrados
+        </Typography>
+        <img className="logo" src="/logo.png" alt="Logo" />
+      </div>
+      <div className="card__body">
+        <CardContent>
+          <Button variant="contained" color="primary" onClick={handleNavigate}>
+            Cadastro
+          </Button>
+          {produtores.map((produtor) => (
+            <Card
+              key={produtor.id}
+              style={{ marginBottom: "20px", marginTop: "20px" }}
+            >
+              <CardContent>
+                {Object.keys(produtor).map((key) => {
+                  if (key !== "id") {
+                    return (
+                      <div key={key} style={{ marginBottom: "10px" }}>
+                        {key === "nomeProdutor" ? (
+                          <Typography variant="h6" gutterBottom>
+                            {produtor[key as keyof ProdutorRural]}
+                          </Typography>
+                        ) : (
+                          <div>
+                            {editId === produtor.id ? (
+                              <TextField
+                                label={
+                                  key.charAt(0).toUpperCase() + key.slice(1)
+                                }
+                                value={
+                                  key === "culturas" &&
+                                  Array.isArray(
+                                    produtor[key as keyof ProdutorRural]
+                                  )
+                                    ? (
+                                        produtor[
+                                          key as keyof ProdutorRural
+                                        ] as string[]
+                                      ).join(", ")
+                                    : produtor[key as keyof ProdutorRural]
+                                }
+                                onChange={(e) =>
+                                  handleChange(e, key as keyof ProdutorRural)
+                                }
+                                variant="outlined"
+                                fullWidth
+                                margin="normal"
+                              />
+                            ) : (
+                              <Typography variant="subtitle1" gutterBottom>
+                                {key.charAt(0).toUpperCase() + key.slice(1)}:{" "}
+                                {key === "culturas" &&
+                                Array.isArray(
+                                  produtor[key as keyof ProdutorRural]
+                                )
+                                  ? (
+                                      produtor[
+                                        key as keyof ProdutorRural
+                                      ] as string[]
+                                    ).join(", ")
+                                  : produtor[key as keyof ProdutorRural]}
+                              </Typography>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+                  return null;
+                })}
+              </CardContent>
 
-        {produtores.map((produtor) => (
-          <Card key={produtor.id} style={{ marginBottom: "10px" }}>
-            <CardContent>
-              {editId === produtor.id ? (
-                // Inputs para edição
-                <div>
-                  <input
-                    type="text"
-                    value={editData.nomeProdutor}
-                    onChange={(e) => handleChange(e, "nomeProdutor")}
-                  />
-                  {/* Adicionar inputs para outros campos conforme necessário */}
-                  <Button onClick={() => handleSave(produtor.id)}>
-                    Salvar Edição
-                  </Button>
-                </div>
-              ) : (
-                // Exibição normal
-                <div>
-                  <Typography variant="h5" component="h2">
-                    {produtor.nomeProdutor}
-                  </Typography>
-                  {/* ... Outras informações do produtor */}
-                </div>
+              <Button onClick={() => excluir(produtor.id)}>Excluir</Button>
+              {editId !== produtor.id && (
+                <Button onClick={() => edit(produtor.id)}>Editar</Button>
               )}
-              <Typography color="textSecondary">CPF: {produtor.cpf}</Typography>
-              <Typography color="textSecondary">
-                Idade: {produtor.idade} anos
-              </Typography>
-              <Typography color="textSecondary">
-                Email: {produtor.email}
-              </Typography>
-              <Typography color="textSecondary">
-                CNPJ: {produtor.cnpj}
-              </Typography>
-              <Typography color="textSecondary">
-                Fazenda: {produtor.nomeFazenda}
-              </Typography>
-              <Typography color="textSecondary">
-                Cidade: {produtor.cidade}
-              </Typography>
-              <Typography color="textSecondary">
-                Estado: {produtor.estado}
-              </Typography>
-              <Typography color="textSecondary">
-                Área Total: {produtor.areaTotal} ha
-              </Typography>
-              <Typography color="textSecondary">
-                Área Agricultável: {produtor.areaAgricultavel} ha
-              </Typography>
-              <Typography color="textSecondary">
-                Área de Vegetação: {produtor.areaVegetacao} ha
-              </Typography>
-              <Typography color="textSecondary">
-                Culturas: {produtor.culturas.join(", ")}
-              </Typography>
-            </CardContent>
-
-            <button onClick={() => excluir(produtor.id)}>Excluir</button>
-            {editId !== produtor.id && (
-              <button onClick={() => edit(produtor.id)}>Editar</button>
-            )}
-          </Card>
-        ))}
-      </CardContent>
+              {editId === produtor.id && (
+                <Button onClick={() => handleSave()}>Salvar Edição</Button>
+              )}
+            </Card>
+          ))}
+        </CardContent>
+      </div>
     </Card>
   );
 }

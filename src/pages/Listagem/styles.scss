@@ -1,12 +1,11 @@
 .card {
-  background: #3c7d39;
-
   &__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
     background: #3c7d39;
+    color: #ffffff;
   }
 }
 
