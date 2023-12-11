@@ -1,30 +1,40 @@
-# React + TypeScript + Vite
+# Brain Agriculture
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Objetivo
 
-Currently, two official plugins are available:
+O projeto consiste em um sistema de cadastro de produtores rurais, com o objetivo de gerenciar informações relacionadas às propriedades agrícolas, culturas plantadas e estatísticas referentes às fazendas.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Pré-requisitos
 
-## Expanding the ESLint configuration
+Para executar este projeto localmente, é necessário ter instalado:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- ReactJS
+- Redux
 
-- Configure the top-level `parserOptions` property like this:
+## Iniciando o projeto
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+Clone este repositório para o diretório desejado em sua máquina:
+
+```
+git clone: https://github.com/brenoqn/brain-ag
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+Navegue até o diretório do projeto:
+
+```
+cd brain-agriculture
+```
+
+Instale as dependências do projeto utilizando o npm (gerenciador de pacotes do Node.js):
+
+```
+npm install
+```
+
+Para iniciar o servidor de desenvolvimento, execute:
+
+```
+npm run dev
+```
+
+O servidor estará disponível no endereço http://127.0.0.1:5173/ . 
