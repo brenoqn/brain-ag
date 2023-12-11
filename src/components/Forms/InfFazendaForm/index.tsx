@@ -1,7 +1,11 @@
 import Box from "@mui/material/Box";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import { cnpj as cnpjValidator } from "cpf-cnpj-validator";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateForm } from "../../../formSlice";
 import { RootState } from "../../../store";
@@ -12,6 +16,8 @@ export function InformacoesFazendaForm() {
 
   const [cnpj, setCnpj] = useState(formData.cnpj || "");
   const [isCnpjValid, setIsCnpjValid] = useState(true);
+  const [estados, setEstados] = useState([]);
+  const [cidades, setCidades] = useState([]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -29,6 +35,44 @@ export function InformacoesFazendaForm() {
     }
   };
 
+  useEffect(() => {
+    // Função para buscar os estados da API do IBGE
+    async function fetchEstados() {
+      try {
+        const response = await fetch(
+          "https://servicodados.ibge.gov.br/api/v1/localidades/estados"
+        );
+        const data = await response.json();
+        setEstados(data);
+      } catch (error) {
+        console.error("Erro ao buscar estados:", error);
+      }
+    }
+
+    fetchEstados();
+  }, []);
+
+  const handleEstadoChange = async (event) => {
+    const estadoSelecionado = event.target.value;
+    dispatch(updateForm({ ...formData, estado: estadoSelecionado }));
+
+    try {
+      const response = await fetch(
+        `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${estadoSelecionado}/municipios`
+      );
+      const data = await response.json();
+      setCidades(data);
+    } catch (error) {
+      console.error("Erro ao buscar cidades:", error);
+      setCidades([]);
+    }
+  };
+
+  const handleCidadeChange = (event) => {
+    const cidadeSelecionada = event.target.value;
+    dispatch(updateForm({ ...formData, cidade: cidadeSelecionada }));
+  };
+
   const formatCnpj = (value: string) => {
     return value
       .replace(/\D/g, "")
@@ -38,7 +82,10 @@ export function InformacoesFazendaForm() {
 
   return (
     <Box
-      sx={{ "& > .MuiTextField-root": { width: "100%", marginBottom: "12px" } }}
+      sx={{
+        "& > .MuiTextField-root": { width: "100%", marginBottom: "12px" },
+        "& > .MuiFormControl-root:not(:last-child)": { marginBottom: "16px" },
+      }}
     >
       <TextField
         id="nomeFazenda"
@@ -63,25 +110,45 @@ export function InformacoesFazendaForm() {
         helperText={!isCnpjValid ? "CNPJ inválido" : ""}
       />
 
-      <TextField
-        id="cidade"
-        name="cidade"
-        label="Cidade"
-        variant="outlined"
-        required
-        value={formData.cidade || ""}
-        onChange={handleInputChange}
-      />
+      <FormControl fullWidth>
+        <InputLabel id="estado-label">Estado</InputLabel>
+        <Select
+          labelId="estado-label"
+          id="estado"
+          name="estado"
+          variant="outlined"
+          label="Estado"
+          required
+          value={formData.estado || ""}
+          onChange={handleEstadoChange}
+        >
+          {estados.map((estado) => (
+            <MenuItem key={estado.id} value={estado.sigla}>
+              {estado.nome}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
 
-      <TextField
-        id="estado"
-        name="estado"
-        label="Estado"
-        variant="outlined"
-        required
-        value={formData.estado || ""}
-        onChange={handleInputChange}
-      />
+      <FormControl fullWidth>
+        <InputLabel id="cidade-label">Cidade</InputLabel>
+        <Select
+          labelId="cidade-label"
+          id="cidade"
+          name="cidade"
+          variant="outlined"
+          label="Cidade"
+          required
+          value={formData.cidade || ""}
+          onChange={handleCidadeChange}
+        >
+          {cidades.map((cidade) => (
+            <MenuItem key={cidade.id} value={cidade.nome}>
+              {cidade.nome}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
     </Box>
   );
 }
