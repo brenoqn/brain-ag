@@ -6,8 +6,10 @@ import StepLabel from "@mui/material/StepLabel";
 import Stepper from "@mui/material/Stepper";
 import Typography from "@mui/material/Typography";
 import React from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from 'uuid';
+import { RootState, adicionarProdutor } from "../../store";
 import { DescricaoFazendaForm } from "../Forms/DescFazendaForm";
 import { InformacoesFazendaForm } from "../Forms/InfFazendaForm";
 import { InformacoesPessoaisForm } from "../Forms/InfPessoaisForm";
@@ -22,11 +24,18 @@ interface FormData {
   nomeFazenda: string;
   cidade: string;
   estado: string;
+  areaTotal: number;
+  areaAgricultavel: number;
+  areaVegetacao: number;
+  culturas: string[];
 }
 
 export function CardGlobal() {
   const [activeStep, setActiveStep] = React.useState(0);
   const formData = useSelector((state: RootState) => state.form);
+  const [showErrorMessage, setShowErrorMessage] = React.useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const getStepContent = (step: number) => {
     switch (step) {
@@ -46,23 +55,43 @@ export function CardGlobal() {
   };
 
   const handleBack = () => {
-    console.log('Voltando para o step anterior');
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const isStepValid = (formData: FormData) => {
-    console.log('Validando:', formData);
-    const isValid = formData.nomeProdutor !== '' && formData.cpf !== '' && formData.idade !== 0 && formData.email !== '';
-    console.log('É válido?', isValid);
-    return isValid;
+  const isStepValid = (step: number, formData: FormData) => {
+    switch (step) {
+      case 0:
+        return (
+          formData.nomeProdutor !== "" &&
+          formData.cpf !== "" &&
+          formData.idade !== 0 &&
+          formData.email !== ""
+        );
+      case 1:
+        return (
+          formData.nomeFazenda !== "" &&
+          formData.cnpj !== "" &&
+          formData.cidade !== "" &&
+          formData.estado !== ""
+        );
+      case 2:
+        return (
+          formData.areaTotal !== 0 &&
+          formData.areaAgricultavel !== 0 &&
+          formData.areaVegetacao !== 0 &&
+          formData.culturas.length > 0
+        );
+      default:
+        return true;
+    }
   };
 
   const handleNextClick = () => {
-    console.log('Clicou em Próximo, Dados Atuais:', formData);
-    if (isStepValid(formData)) {
+    if (isStepValid(activeStep, formData)) {
+      setShowErrorMessage(false);
       handleNext();
     } else {
-      console.log('Falha na validação, não pode avançar.');
+      setShowErrorMessage(true);
     }
   };
 
@@ -71,7 +100,13 @@ export function CardGlobal() {
   };
 
   const handleSubmit = () => {
-    console.log('Dados finais no submit:', formData);
+    dispatch(
+      adicionarProdutor({
+        ...formData,
+        id: uuidv4(),
+      })
+    );
+    navigate("/lista");
   };
 
   return (
@@ -82,6 +117,7 @@ export function CardGlobal() {
             <Typography variant="h3" component="div" className="title">
               Cadastro de Produtor Rural
             </Typography>
+            <img className="logo" src="/logo.png" />
           </div>
           <div className="card--cadastro__content--body">
             <Stepper activeStep={activeStep} alternativeLabel>
@@ -96,6 +132,13 @@ export function CardGlobal() {
               </Step>
             </Stepper>
             {getStepContent(activeStep)}
+            {showErrorMessage && (
+              <div
+                style={{ color: "red", textAlign: "center", margin: "10px 0" }}
+              >
+                Por favor, preencha todos os campos obrigatórios.
+              </div>
+            )}
             <div className="buttons">
               <Button disabled={activeStep === 0} onClick={handleBackClick}>
                 Anterior

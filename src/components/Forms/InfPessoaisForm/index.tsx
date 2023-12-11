@@ -24,6 +24,7 @@ export function InformacoesPessoaisForm() {
     setCpf(formattedCpf);
     setIsCpfValid(cpfValidator.isValid(formattedCpf));
     setCpfTouched(true);
+    dispatch(updateForm({ ...formData, cpf: formatCpf(formattedCpf) }));
   };
 
   const formatCpf = (value: string) => {
@@ -35,7 +36,6 @@ export function InformacoesPessoaisForm() {
 
   return (
     <Box
-      className="container"
       sx={{
         "& > .MuiTextField-root": { width: "100%", marginBottom: "12px" },
         "& > .MuiFormControl-root": { width: "100%", marginBottom: "12px" },

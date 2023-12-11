@@ -38,7 +38,6 @@ export function InformacoesFazendaForm() {
 
   return (
     <Box
-      className="container"
       sx={{ "& > .MuiTextField-root": { width: "100%", marginBottom: "12px" } }}
     >
       <TextField

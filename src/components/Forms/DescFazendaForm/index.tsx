@@ -39,7 +39,7 @@ export function DescricaoFazendaForm() {
   };
 
   const handleCulturasChange = (event: SelectChangeEvent<string[]>) => {
-    const value = event.target.value as string[]; // Casting para string[]
+    const value = event.target.value as string[];
     setCulturas(value);
     dispatch(updateForm({ ...formData, culturas: value }));
   };
@@ -51,7 +51,6 @@ export function DescricaoFazendaForm() {
 
   return (
     <Box
-      className="container"
       sx={{ "& > .MuiTextField-root": { width: "100%", marginBottom: "12px" } }}
     >
       <TextField
