@@ -9,6 +9,18 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateForm } from "../../../formSlice";
 import { RootState } from "../../../store";
+import { ChangeEvent } from "react";
+
+interface Estado {
+  id: number;
+  nome: string;
+  sigla: string;
+}
+
+interface Cidade {
+  id: number;
+  nome: string;
+}
 
 export function InformacoesFazendaForm() {
   const dispatch = useDispatch();
@@ -16,8 +28,8 @@ export function InformacoesFazendaForm() {
 
   const [cnpj, setCnpj] = useState(formData.cnpj || "");
   const [isCnpjValid, setIsCnpjValid] = useState(true);
-  const [estados, setEstados] = useState([]);
-  const [cidades, setCidades] = useState([]);
+  const [estados, setEstados] = useState<Estado[]>([]); 
+  const [cidades, setCidades] = useState<Cidade[]>([]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -36,7 +48,6 @@ export function InformacoesFazendaForm() {
   };
 
   useEffect(() => {
-    // Função para buscar os estados da API do IBGE
     async function fetchEstados() {
       try {
         const response = await fetch(
@@ -52,10 +63,10 @@ export function InformacoesFazendaForm() {
     fetchEstados();
   }, []);
 
-  const handleEstadoChange = async (event) => {
-    const estadoSelecionado = event.target.value;
+  const handleEstadoChange = async (event: ChangeEvent<{ value: unknown }>) => {
+    const estadoSelecionado = event.target.value as string;
     dispatch(updateForm({ ...formData, estado: estadoSelecionado }));
-
+  
     try {
       const response = await fetch(
         `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${estadoSelecionado}/municipios`
@@ -67,12 +78,12 @@ export function InformacoesFazendaForm() {
       setCidades([]);
     }
   };
-
-  const handleCidadeChange = (event) => {
-    const cidadeSelecionada = event.target.value;
+  
+  const handleCidadeChange = (event: ChangeEvent<{ value: unknown }>) => {
+    const cidadeSelecionada = event.target.value as string;
     dispatch(updateForm({ ...formData, cidade: cidadeSelecionada }));
   };
-
+  
   const formatCnpj = (value: string) => {
     return value
       .replace(/\D/g, "")

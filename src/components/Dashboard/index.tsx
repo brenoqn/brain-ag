@@ -140,7 +140,7 @@ export function Dashboard() {
     <Card className="card">
       <div className="card__header">
         <Typography variant="h3" component="div" className="title">
-          Dashboardy
+          Dashboard
         </Typography>
         <img className="logo" src="/logo.png" alt="Logo" />
       </div>

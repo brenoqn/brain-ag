@@ -1,6 +1,7 @@
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+// import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import TableContainer from "@mui/material/TableContainer";
 import Table from "@mui/material/Table";
@@ -9,6 +10,7 @@ import TableBody from "@mui/material/TableBody";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import Paper from "@mui/material/Paper";
+
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +21,7 @@ import {
   excluirProdutor,
 } from "../../store";
 import "./styles.scss";
+import TextField from "@mui/material/TextField";
 
 export function ListaProdutores() {
   const produtorInicial: ProdutorRural = {
@@ -61,7 +64,20 @@ export function ListaProdutores() {
     dispatch(editarProdutor(editData));
     setEditId(null);
   };
-
+  const formatedCol = {
+    nomeProdutor: "Nome do Produtor",
+    cpf: "CPF",
+    idade: "Idade",
+    email: "E-mail",
+    cnpj: "CNPJ",
+    nomeFazenda: "Nome da Fazenda",
+    cidade: "Cidade",
+    estado: "Estado",
+    areaTotal: "Área Total",
+    areaAgricultavel: "Área Agricultável ",
+    areaVegetacao: "Área Vegetação",
+    culturas: "Culturas",
+  };
   // const handleChange = (
   //   e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   //   field: keyof ProdutorRural
@@ -109,7 +125,11 @@ export function ListaProdutores() {
           >
             <Table>
               <TableHead>
-                <TableRow>
+                <TableRow
+                  sx={{
+                    background: "#bbcdba",
+                  }}
+                >
                   {Object.keys(produtorInicial).map(
                     (key) =>
                       key !== "id" && (
@@ -120,14 +140,27 @@ export function ListaProdutores() {
                               key === "Actions"
                                 ? { xs: "none", sm: "table-cell" }
                                 : "table-cell",
-                            fontSize: 12,
+                            whiteSpace:
+                              key === "cpf" || key === "cnpj"
+                                ? "nowrap"
+                                : "inherit",
+                            overflow:
+                              key === "cpf" || key === "cnpj"
+                                ? "hidden"
+                                : "inherit",
+                            textOverflow:
+                              key === "cpf" || key === "cnpj"
+                                ? "ellipsis"
+                                : "inherit",
+                            fontSize: 15,
                             textAlign: key === "cpf" ? "center" : "",
                           }}
                         >
-                          {key}
+                          {formatedCol[key]}
                         </TableCell>
                       )
                   )}
+                  <TableCell></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -138,36 +171,37 @@ export function ListaProdutores() {
                         key !== "id" && (
                           <TableCell
                             key={key}
-                            sx={{
-                              whiteSpace:
-                                key === "cpf" || key === "cnpj"
-                                  ? "nowrap"
-                                  : "inherit",
-                              overflow:
-                                key === "cpf" || key === "cnpj"
-                                  ? "hidden"
-                                  : "inherit",
-                              textOverflow:
-                                key === "cpf" || key === "cnpj"
-                                  ? "ellipsis"
-                                  : "inherit",
-                              textAlign:
-                                key === "areaTotal" ||
-                                key === "areaAgricultavel" ||
-                                key === "areaVegetacao" ||
-                                key === "idade"
-                                  ? "center"
-                                  : "",
-                              fontSize: 12,
-                            }}
+                            sx={
+                              {
+                                // Estilos existentes
+                              }
+                            }
                           >
-                            {Array.isArray(produtor[key as keyof ProdutorRural])
-                              ? (
+                            {editId !== produtor.id ? (
+                              Array.isArray(
+                                produtor[key as keyof ProdutorRural]
+                              ) ? (
+                                (
                                   produtor[
                                     key as keyof ProdutorRural
                                   ] as string[]
                                 ).join(", ")
-                              : produtor[key as keyof ProdutorRural]}
+                              ) : (
+                                produtor[key as keyof ProdutorRural]
+                              )
+                            ) : (
+                              <TextField
+                                id={key}
+                                label={formatedCol[key]}
+                                value={editData[key as keyof ProdutorRural]}
+                                onChange={(e) =>
+                                  setEditData({
+                                    ...editData,
+                                    [key]: e.target.value,
+                                  })
+                                }
+                              />
+                            )}
                           </TableCell>
                         )
                     )}
@@ -180,7 +214,9 @@ export function ListaProdutores() {
                           fontSize: 12,
                         }}
                       >
-                        Excluir
+                        <span className="material-symbols-outlined">
+                          delete
+                        </span>
                       </Button>
                       {editId !== produtor.id && (
                         <Button
@@ -189,12 +225,16 @@ export function ListaProdutores() {
                           }}
                           onClick={() => edit(produtor.id)}
                         >
-                          Editar
+                          <span className="material-symbols-outlined">
+                            edit
+                          </span>
                         </Button>
                       )}
                       {editId === produtor.id && (
                         <Button onClick={() => handleSave()}>
-                          Salvar Edição
+                          <span className="material-symbols-outlined">
+                            save
+                          </span>
                         </Button>
                       )}
                     </TableCell>
