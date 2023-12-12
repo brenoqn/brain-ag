@@ -119,10 +119,7 @@ export function ListaProdutores() {
               Dashboard
             </Button>
           </div>
-          <TableContainer
-            component={Paper}
-            sx={{ overflowX: "auto", marginTop: "20px" }}
-          >
+          <TableContainer component={Paper} sx={{ overflowX: "auto" , marginTop: "20px"}}>
             <Table>
               <TableHead>
                 <TableRow
@@ -164,47 +161,48 @@ export function ListaProdutores() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {produtores.map((produtor) => (
-                  <TableRow key={produtor.id}>
-                    {Object.keys(produtor).map(
-                      (key) =>
-                        key !== "id" && (
-                          <TableCell
-                            key={key}
-                            sx={
-                              {
-                                // Estilos existentes
-                              }
+              {produtores.map((produtor) => (
+              <TableRow key={produtor.id}>
+                {Object.keys(produtor).map(
+                  (key) =>
+                    key !== "id" && (
+                      <TableCell
+                        key={key}
+                        sx={{
+                          whiteSpace:
+                            key === "cpf" || key === "cnpj"
+                              ? "nowrap"
+                              : "inherit",
+                          overflow:
+                            key === "cpf" || key === "cnpj"
+                              ? "hidden"
+                              : "inherit",
+                          textOverflow:
+                            key === "cpf" || key === "cnpj"
+                              ? "ellipsis"
+                              : "inherit",
+                          fontSize: 15,
+                        }}
+                      >
+                        {editId !== produtor.id ? (
+                          Array.isArray(produtor[key as keyof ProdutorRural]) ? (
+                            (produtor[key as keyof ProdutorRural] as string[]).join(", ")
+                          ) : (
+                            produtor[key as keyof ProdutorRural]
+                          )
+                        ) : (
+                          <TextField
+                            id={key}
+                            label={formatedCol[key]}
+                            value={editData[key as keyof ProdutorRural]}
+                            onChange={(e) =>
+                              setEditData({ ...editData, [key]: e.target.value })
                             }
-                          >
-                            {editId !== produtor.id ? (
-                              Array.isArray(
-                                produtor[key as keyof ProdutorRural]
-                              ) ? (
-                                (
-                                  produtor[
-                                    key as keyof ProdutorRural
-                                  ] as string[]
-                                ).join(", ")
-                              ) : (
-                                produtor[key as keyof ProdutorRural]
-                              )
-                            ) : (
-                              <TextField
-                                id={key}
-                                label={formatedCol[key]}
-                                value={editData[key as keyof ProdutorRural]}
-                                onChange={(e) =>
-                                  setEditData({
-                                    ...editData,
-                                    [key]: e.target.value,
-                                  })
-                                }
-                              />
-                            )}
-                          </TableCell>
-                        )
-                    )}
+                          />
+                        )}
+                      </TableCell>
+                    )
+                )}
                     <TableCell>
                       <Button
                         onClick={() => excluir(produtor.id)}
